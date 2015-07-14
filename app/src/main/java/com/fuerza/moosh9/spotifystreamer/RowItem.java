@@ -10,9 +10,14 @@ public class RowItem {
     private String desc2;
     private String desc;
 
-    public RowItem(int imageId, String title, String desc) {
+    public RowItem(int imageId, String desc2, String desc) {
         this.imageId = imageId;
-        this.desc2 = title;
+        this.desc2 = desc2;
+        this.desc = desc;
+    }
+
+    public RowItem(String desc, String desc2) {
+        this.desc2 = desc2;
         this.desc = desc;
     }
 
@@ -35,7 +40,7 @@ public class RowItem {
     public String getDesc2() {
         return desc2;
     }
-    public void setTitle(String title) {
+    public void setDesc2(String title) {
         this.desc2 = title;
     }
     @Override

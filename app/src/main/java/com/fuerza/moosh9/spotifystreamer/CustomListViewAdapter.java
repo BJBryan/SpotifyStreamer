@@ -37,9 +37,22 @@ public class CustomListViewAdapter extends ArrayAdapter<RowItem> {
 
     //TODO change the type later when spotify json reader is hooked up
     public void addAll(ArrayList<String> result) {
-         rowItems= new ArrayList<RowItem>();
+       //  rowItems= new ArrayList<RowItem>();
+
         for (int i=0; i < result.size(); i++) {
             RowItem item= new RowItem(result.get(i));
+            this.add(item);
+        }
+
+
+    }
+
+    //TODO change the type later when spotify json reader is hooked up
+    public void addAll(ArrayList<String[]> trackData,int ignore) {
+       // rowItems= new ArrayList<RowItem>();
+
+        for (int i=0; i < trackData.size(); i++) {
+            RowItem item= new RowItem(trackData.get(i)[0],trackData.get(i)[1]);
             this.add(item);
         }
 

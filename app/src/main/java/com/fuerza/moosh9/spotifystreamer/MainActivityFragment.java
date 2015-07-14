@@ -80,8 +80,6 @@ public class MainActivityFragment extends Fragment {
         super.onStart();
         searchWhenReady();
 
-
-
     }
 
     private void searchWhenReady() {
@@ -122,9 +120,6 @@ public class MainActivityFragment extends Fragment {
     //search for artists from Spotify
     private void searchArtists() {
         //requires internet search so must create a background thread
-
-
-
         SearchArtistTask searchTask= new SearchArtistTask();
         //begin background thread search
         searchTask.execute(artist);
@@ -135,7 +130,7 @@ public class MainActivityFragment extends Fragment {
 
 
     public class SearchArtistTask extends AsyncTask<String,Void,ArrayList<String>> {
-
+    //ASync task is an easy way of creating background threads.
         private final String LOG_TAG = SearchArtistTask.class.getSimpleName();
 
         //Gives instructions for what to do in background thread
@@ -146,8 +141,6 @@ public class MainActivityFragment extends Fragment {
                 System.out.println("There was no artist to get data on!");
                 return null;
             }else {
-
-
 
                 String artist = params[0];
                 return generateSpotifyData(artist);
