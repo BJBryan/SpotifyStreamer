@@ -20,15 +20,19 @@ import java.util.List;
 public class CustomListViewAdapter extends ArrayAdapter<RowItem> {
 
     Context context;
+    int resourceId;
+    int[] viewIds;
     List<RowItem> rowItems;
 
 
 
 
-    public CustomListViewAdapter(Context context, int resourceId,
+    public CustomListViewAdapter(Context context, int mainLayoutId,int[] viewIds,
                                  List<RowItem> items) {
-        super(context, resourceId, items);
+        super(context, mainLayoutId, items);
         this.context = context;
+        this.resourceId= mainLayoutId;
+        this.viewIds= viewIds;
     }
 
     //TODO change the type later when spotify json reader is hooked up
@@ -46,7 +50,7 @@ public class CustomListViewAdapter extends ArrayAdapter<RowItem> {
     /*private view holder class*/
     private class ViewHolder {
         ImageView imageView;
-        //TextView txtTitle;
+        TextView txtDesc2;
         TextView txtDesc;
     }
 
@@ -57,17 +61,25 @@ public class CustomListViewAdapter extends ArrayAdapter<RowItem> {
         LayoutInflater mInflater = (LayoutInflater) context
                 .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.list_item_artist, null);
+            convertView = mInflater.inflate(resourceId, null);
             holder = new ViewHolder();
-            holder.txtDesc = (TextView) convertView.findViewById(R.id.artist_name);
-            holder.imageView = (ImageView) convertView.findViewById(R.id.artist_image);
+            holder.txtDesc = (TextView) convertView.findViewById(viewIds[0]);
+            holder.imageView = (ImageView) convertView.findViewById(viewIds[1]);
+
+            if (viewIds[2] != 0) {
+                holder.txtDesc2= (TextView) convertView.findViewById(viewIds[2]);
+            }
+
             convertView.setTag(holder);
         } else
             holder = (ViewHolder) convertView.getTag();
 
         holder.txtDesc.setText(rowItem.getDesc());
-       // holder.txtTitle.setText(rowItem.getTitle());
-        //holder.imageView.setImageResource(rowItem.getImageId());
+        holder.imageView.setImageResource(rowItem.getImageId());
+
+        if (viewIds[2] != 0) {
+            holder.txtDesc2.setText(rowItem.getDesc2());
+        }
 
         return convertView;
     }

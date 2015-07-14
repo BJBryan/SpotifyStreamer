@@ -44,9 +44,18 @@ public class MainActivityFragment extends Fragment {
         View rootView= inflater.inflate(R.layout.fragment_main, container, false);
 
         //Create arrayAdapter to populate artist list
+
+        //first pack resource Views in array to put in adapter
+        int[] idArray= new int[3];
+        idArray[0]= R.id.artist_name;
+        idArray[1]= R.id.artist_image;
+
+
+
         spotifyAdapter=
                 new CustomListViewAdapter(getActivity(),
                         R.layout.list_item_artist,
+                        idArray,
                         new ArrayList<RowItem>() );
 
         //code that actually attaches adapter to ListView
