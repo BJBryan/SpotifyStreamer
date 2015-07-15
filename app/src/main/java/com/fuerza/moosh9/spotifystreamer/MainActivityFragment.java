@@ -346,6 +346,7 @@ public class MainActivityFragment extends Fragment {
 
         @Override
         protected void onPostExecute(ArrayList<String[]> result) {
+            //throw up toast if no results
             if (resultsCheck != false) {
                 spotifyAdapter.clear();
                 spotifyAdapter.addAll(result);

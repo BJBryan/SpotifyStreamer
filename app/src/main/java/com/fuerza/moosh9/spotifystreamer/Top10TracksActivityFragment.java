@@ -1,5 +1,6 @@
 package com.fuerza.moosh9.spotifystreamer;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,6 +35,7 @@ public class Top10TracksActivityFragment extends Fragment {
 
     private final String LOG_TAG = Top10TracksActivityFragment.class.getSimpleName();
     private CustomListViewAdapter spotifyAdapter;
+    private Boolean resultsCheck;
 
     String artist;
 
@@ -236,6 +239,11 @@ public class Top10TracksActivityFragment extends Fragment {
 
             JSONArray spotifyJsonArray= (new JSONObject(tracksJson)).getJSONArray(SPO_TRACKS);
 
+            if (spotifyJsonArray.length() == 0) {
+                resultsCheck= false;
+            }else {
+                resultsCheck= true;
+            }
 
             for(int i= 0; i < spotifyJsonArray.length(); i++) {
 
@@ -305,10 +313,18 @@ public class Top10TracksActivityFragment extends Fragment {
 
         @Override
         protected void onPostExecute(ArrayList<String[]> result) {
-            if (result != null) {
+            //throw up toast if no results
+            if (resultsCheck != false) {
                 spotifyAdapter.clear();
                 spotifyAdapter.addAll(result);
 
+            }else {
+                Context context= getActivity().getApplicationContext();
+                CharSequence text= "No top tracks in our database for that artist. Bummer.";
+                int duration= Toast.LENGTH_LONG;
+
+                Toast toast= Toast.makeText(context,text,duration);
+                toast.show();
 
             }
         }
