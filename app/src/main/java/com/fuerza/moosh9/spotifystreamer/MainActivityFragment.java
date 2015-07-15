@@ -17,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,7 +43,7 @@ public class MainActivityFragment extends Fragment {
 
     private String artist;
     private String idNumber;
-
+    private Boolean resultsCheck;
 
     public MainActivityFragment() {
     }
@@ -269,6 +270,15 @@ public class MainActivityFragment extends Fragment {
 
             JSONArray artistArray= spotifyJson.getJSONArray(SPO_ITEMS);
 
+            if (artistArray.length() == 0) {
+                //if there is no such artist set marker
+                resultsCheck= false;
+
+
+            }else {
+                resultsCheck= true;
+            }
+
             for(int i= 0; i < artistArray.length(); i++) {
 
                 //********Container must be defined INSIDE the loop otherwise it every entry will be an instance of the same container!
@@ -336,10 +346,17 @@ public class MainActivityFragment extends Fragment {
 
         @Override
         protected void onPostExecute(ArrayList<String[]> result) {
-            if (result != null) {
+            if (resultsCheck != false) {
                 spotifyAdapter.clear();
                 spotifyAdapter.addAll(result);
 
+            }else {
+                Context context= getActivity().getApplicationContext();
+                CharSequence text= "0 Results for that artist. Bummer.";
+                int duration= Toast.LENGTH_LONG;
+
+                Toast toast= Toast.makeText(context,text,duration);
+                toast.show();
 
             }
         }
