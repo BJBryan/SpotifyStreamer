@@ -41,24 +41,14 @@ public class CustomListViewAdapter extends ArrayAdapter<RowItem> {
     public void addAll(ArrayList<String[]> artistData) {
 
         for (int i=0; i < artistData.size(); i++) {
-            RowItem item= new RowItem(artistData.get(i)[0],"",artistData.get(i)[2]);
+            RowItem item= new RowItem(artistData.get(i)[0],artistData.get(i)[1],artistData.get(i)[2]);
             this.add(item);
         }
 
 
     }
 
-    //TODO change the type later when spotify json reader is hooked up
-    public void addAll(ArrayList<String[]> trackData,int ignore) {
-       // rowItems= new ArrayList<RowItem>();
 
-        for (int i=0; i < trackData.size(); i++) {
-            RowItem item= new RowItem(trackData.get(i)[0],trackData.get(i)[1]);
-            this.add(item);
-        }
-
-
-    }
 
 
     /*private view holder class*/

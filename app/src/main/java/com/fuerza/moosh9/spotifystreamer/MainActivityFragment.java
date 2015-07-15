@@ -41,6 +41,7 @@ public class MainActivityFragment extends Fragment {
     private CustomListViewAdapter spotifyAdapter;
 
     private String artist;
+    private String idNumber;
 
 
     public MainActivityFragment() {
@@ -74,14 +75,14 @@ public class MainActivityFragment extends Fragment {
         //code that actually attaches adapter to ListView
         ListView listView= (ListView) rootView.findViewById(R.id.artist_search_listView);
         listView.setAdapter(spotifyAdapter);
-        listView.setOnItemClickListener((new AdapterView.OnItemClickListener() {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), Top10TracksActivity.class)
-                        .putExtra(Intent.EXTRA_TEXT, artist); //add artist name so next activity can search tracks
+                        .putExtra(Intent.EXTRA_TEXT, idNumber);
                 startActivity(intent);
             }
-        }));
+        });
         return rootView;
     }
 
@@ -166,28 +167,6 @@ public class MainActivityFragment extends Fragment {
         private ArrayList<String[]> generateSpotifyData(String artist) {
 
 
-            String name= artist;
-
-
-
-
-            /////////////////////////////////////////////////
-            //temporary sample data generation
-            ArrayList<String[]> data= new ArrayList<>();
-            String[] fakeArtist= new String[3];
-            for ( int i=1; i<30; i++) {
-                fakeArtist[0]= name;
-                fakeArtist[1]= "12fdre64581";
-                data.add(fakeArtist);
-            }
-
-            //if (true) {
-           //     return data;
-           // }
-
-            /////////////////////////////////////////////////
-
-
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
             HttpURLConnection urlConnection = null;
@@ -270,8 +249,7 @@ public class MainActivityFragment extends Fragment {
             }
 
             //This will only happen if there was an error getting or parsing Sdata
-            System.out.println("NO INTERNET!!!!!!!");
-            return data;
+            return null;
         }
 
         private ArrayList<String[]> parseSpotifyJson(String artistJson)
@@ -306,7 +284,11 @@ public class MainActivityFragment extends Fragment {
 
 
                 //Get the string representing the Spotify ID
+                //actually this is totally unneeded and code could be re-written to get rid of it
                 artistData[1]= suggestedArtist.getString(SPO_ID);
+                //put id into global variable
+                idNumber= artistData[1];
+
 
 
 
