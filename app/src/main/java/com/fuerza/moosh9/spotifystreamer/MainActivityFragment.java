@@ -2,6 +2,7 @@ package com.fuerza.moosh9.spotifystreamer;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -23,8 +24,13 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
+
+import javax.net.ssl.HttpsURLConnection;
 
 
 /**
@@ -175,9 +181,9 @@ public class MainActivityFragment extends Fragment {
                 data.add(fakeArtist);
             }
 
-            if (true) {
-                return data;
-            }
+            //if (true) {
+           //     return data;
+           // }
 
             /////////////////////////////////////////////////
 
@@ -193,12 +199,49 @@ public class MainActivityFragment extends Fragment {
            final String query_type= "artist";
 
             try {
+                //construct the URL for the Spotify query
+                //possible parameters are available at the spotify api page at
+                // https://developer.spotify.com/web-api/search-item/
+                final String SPOTIFY_BASE_URL=
+                        "https://api.spotify.com/v1/search?";
+                final String QUERY_PARAM= "q";
+                final String TYPE_PARAM= "type";
 
-                if (false) {
-                    throw new IOException() {};
+                Uri buildUri= Uri.parse(SPOTIFY_BASE_URL).buildUpon()
+                        .appendQueryParameter(QUERY_PARAM,artist)
+                        .appendQueryParameter(TYPE_PARAM,query_type)
+                        .build();
+
+                URL url= new URL(buildUri.toString());
+
+                //Create the request to OpenWeatherMap and open the connections
+                urlConnection= (HttpsURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+
+                //Read the input stream into a String
+                InputStream inputStream= urlConnection.getInputStream();
+                StringBuffer buffer= new StringBuffer();
+                if (inputStream == null) {
+                    //nothing to do
+                    return null;
                 }
-                //TODO: internet stuff
+                reader= new BufferedReader(new InputStreamReader(inputStream));
 
+                String line;
+                while ((line= reader.readLine()) != null) {
+                    //Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+                    //But it does make debugging a *lot* easier if you print out the completed
+                    //buffer before debugging
+                    buffer.append(line + "\n");
+                }
+
+                if (buffer.length() == 0) {
+                    //Stream was empty. No point in parsing
+                    return null;
+                }
+
+                artistJsonStr= buffer.toString();
 
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error ", e);
@@ -220,13 +263,14 @@ public class MainActivityFragment extends Fragment {
             }
 
             try {
-                return parseSpotifyJson(artist);
+                return parseSpotifyJson(artistJsonStr);
             } catch (JSONException e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
                 e.printStackTrace();
             }
 
             //This will only happen if there was an error getting or parsing Sdata
+            System.out.println("NO INTERNET!!!!!!!");
             return data;
         }
 
@@ -235,7 +279,7 @@ public class MainActivityFragment extends Fragment {
 
             //the ArrayList<String> that will ultimately be returned and its constituent artist containers
             ArrayList<String[]> artistArrayList= new ArrayList<>();
-            String[] artistData= new String[3];
+
 
             //These are the names of the JSON objects that need to be extracted
             final String SPO_ITEMS= "items";
@@ -243,16 +287,22 @@ public class MainActivityFragment extends Fragment {
             final String SPO_ID= "id";
             final String SPO_IMAGES= "images"; //ideally the 64 X 64 thumbnail images
 
-            JSONObject spotifyJson= new JSONObject(artistJson);
+            JSONObject spotifyJson= (new JSONObject(artistJson)).getJSONObject("artists");
+
             JSONArray artistArray= spotifyJson.getJSONArray(SPO_ITEMS);
 
             for(int i= 0; i < artistArray.length(); i++) {
+
+                //********Container must be defined INSIDE the loop otherwise it every entry will be an instance of the same container!
+                //this causes a pesky bug where every member of the ArrayList is the same
+                String[] artistData= new String[3];
 
                 //Get data from artist object i in the list
                 JSONObject suggestedArtist= artistArray.getJSONObject(i);
 
                 //Get the string representing the artist name and add it to data
                 artistData[0]= suggestedArtist.getString(SPO_NAME);
+                //System.out.println(artistData[0]);
 
 
                 //Get the string representing the Spotify ID
@@ -287,12 +337,12 @@ public class MainActivityFragment extends Fragment {
                         }
 
 
-                        index += index;
+                        index = index + 1;
                     }
                     //add image to data
                     artistData[2]= artistImageArray.getJSONObject(smallestImageIndex).getString("url");
                 }
-
+                System.out.println(artistData[0] + " " + artistData[1]);
                 artistArrayList.add(artistData);
 
             }
@@ -307,6 +357,7 @@ public class MainActivityFragment extends Fragment {
             if (result != null) {
                 spotifyAdapter.clear();
                 spotifyAdapter.addAll(result);
+                System.out.println("got here!");
 
             }
         }
