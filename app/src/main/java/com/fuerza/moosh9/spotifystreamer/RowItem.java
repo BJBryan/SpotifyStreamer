@@ -6,13 +6,17 @@ package com.fuerza.moosh9.spotifystreamer;
  */
 public class RowItem {
 //just a container for the information to go in a custom ListView
-    private int imageId;
+    private String imageURL;
     private String desc2;
     private String desc;
 
-    public RowItem(int imageId, String desc2, String desc) {
-        this.imageId = imageId;
-        this.desc2 = desc2;
+    public RowItem(String desc, String desc2, String imageURL) {
+        this.imageURL = imageURL;
+
+        if (!desc2.equals("")){
+            this.desc2 = desc2;
+        }
+
         this.desc = desc;
     }
 
@@ -25,12 +29,14 @@ public class RowItem {
         this.desc= desc;
     }
 
-    public int getImageId() {
-        return imageId;
+    public String getImage() {
+
+
+        return imageURL;
+
+
     }
-    public void setImageId(int imageId) {
-        this.imageId = imageId;
-    }
+
     public String getDesc() {
         return desc;
     }

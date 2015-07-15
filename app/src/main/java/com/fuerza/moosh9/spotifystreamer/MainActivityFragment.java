@@ -342,7 +342,7 @@ public class MainActivityFragment extends Fragment {
                     //add image to data
                     artistData[2]= artistImageArray.getJSONObject(smallestImageIndex).getString("url");
                 }
-                System.out.println(artistData[0] + " " + artistData[1]);
+
                 artistArrayList.add(artistData);
 
             }
@@ -357,7 +357,7 @@ public class MainActivityFragment extends Fragment {
             if (result != null) {
                 spotifyAdapter.clear();
                 spotifyAdapter.addAll(result);
-                System.out.println("got here!");
+
 
             }
         }

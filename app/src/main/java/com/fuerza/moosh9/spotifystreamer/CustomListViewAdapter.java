@@ -9,6 +9,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +41,7 @@ public class CustomListViewAdapter extends ArrayAdapter<RowItem> {
     public void addAll(ArrayList<String[]> artistData) {
 
         for (int i=0; i < artistData.size(); i++) {
-            RowItem item= new RowItem(artistData.get(i)[0]);
+            RowItem item= new RowItem(artistData.get(i)[0],"",artistData.get(i)[2]);
             this.add(item);
         }
 
@@ -87,7 +89,9 @@ public class CustomListViewAdapter extends ArrayAdapter<RowItem> {
             holder = (ViewHolder) convertView.getTag();
 
         holder.txtDesc.setText(rowItem.getDesc());
-        holder.imageView.setImageResource(rowItem.getImageId());
+        //Picasso automatically handles images
+        Picasso.with(context).load(rowItem.getImage()).into(holder.imageView);
+
 
         if (viewIds[2] != 0) {
             holder.txtDesc2.setText(rowItem.getDesc2());
