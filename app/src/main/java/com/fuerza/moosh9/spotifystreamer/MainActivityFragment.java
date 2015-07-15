@@ -42,6 +42,7 @@ public class MainActivityFragment extends Fragment {
     private CustomListViewAdapter spotifyAdapter;
 
     private String artist;
+    private String artistName;
     private String idNumber;
     private Boolean resultsCheck;
 
@@ -79,8 +80,14 @@ public class MainActivityFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                RowItem item= spotifyAdapter.getItem(position);
+                idNumber= item.getDesc2();
+                artistName= item.getDesc();
+
                 Intent intent = new Intent(getActivity(), Top10TracksActivity.class)
-                        .putExtra(Intent.EXTRA_TEXT, idNumber);
+                        .putExtra(Intent.EXTRA_TEXT, idNumber)
+                        .putExtra(Intent.EXTRA_TITLE,artistName);
                 startActivity(intent);
             }
         });
@@ -296,8 +303,7 @@ public class MainActivityFragment extends Fragment {
                 //Get the string representing the Spotify ID
                 //actually this is totally unneeded and code could be re-written to get rid of it
                 artistData[1]= suggestedArtist.getString(SPO_ID);
-                //put id into global variable
-                idNumber= artistData[1];
+
 
 
 

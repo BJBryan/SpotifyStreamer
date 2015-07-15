@@ -28,7 +28,7 @@ public class Top10TracksActivity extends ActionBarActivity {
         //  called via intent.  Inspect the intent for artist name.
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
-            artist = intent.getStringExtra(Intent.EXTRA_TEXT);
+            artist = intent.getStringExtra(Intent.EXTRA_TITLE);
 
         }
 
