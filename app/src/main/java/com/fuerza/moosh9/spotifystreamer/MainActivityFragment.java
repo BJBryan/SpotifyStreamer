@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,8 +17,14 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -28,7 +35,7 @@ public class MainActivityFragment extends Fragment {
     private CustomListViewAdapter spotifyAdapter;
 
     private String artist;
-    List<RowItem> rowItems;
+
 
     public MainActivityFragment() {
     }
@@ -129,13 +136,13 @@ public class MainActivityFragment extends Fragment {
     }
 
 
-    public class SearchArtistTask extends AsyncTask<String,Void,ArrayList<String>> {
+    public class SearchArtistTask extends AsyncTask<String,Void,ArrayList<String[]>> {
     //ASync task is an easy way of creating background threads.
         private final String LOG_TAG = SearchArtistTask.class.getSimpleName();
 
         //Gives instructions for what to do in background thread
         @Override
-        protected ArrayList<String> doInBackground(String... params) {
+        protected ArrayList<String[]> doInBackground(String... params) {
 
             if (params.length == 0) {
                 System.out.println("There was no artist to get data on!");
@@ -150,22 +157,153 @@ public class MainActivityFragment extends Fragment {
 
 
         //actually does work of interacting with Spotify servers
-        private ArrayList<String> generateSpotifyData(String artist) {
+        private ArrayList<String[]> generateSpotifyData(String artist) {
 
 
             String name= artist;
 
+
+
+
+            /////////////////////////////////////////////////
             //temporary sample data generation
-            ArrayList<String> data= new ArrayList<>();
+            ArrayList<String[]> data= new ArrayList<>();
+            String[] fakeArtist= new String[3];
             for ( int i=1; i<30; i++) {
-                data.add(name + " option "+i);
+                fakeArtist[0]= name;
+                fakeArtist[1]= "12fdre64581";
+                data.add(fakeArtist);
             }
 
+            if (true) {
+                return data;
+            }
+
+            /////////////////////////////////////////////////
+
+
+            // These two need to be declared outside the try/catch
+            // so that they can be closed in the finally block.
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
+
+            // Will contain the raw JSON response as a string.
+            String artistJsonStr = null;
+
+           final String query_type= "artist";
+
+            try {
+
+                if (false) {
+                    throw new IOException() {};
+                }
+                //TODO: internet stuff
+
+
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "Error ", e);
+                //If the code didn't successfully get the Spotify data there's
+                //no point in attempting to parse it.
+                return null;
+
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (final IOException e) {
+                        Log.e(LOG_TAG, "Error closing stream", e);
+                    }
+                }
+            }
+
+            try {
+                return parseSpotifyJson(artist);
+            } catch (JSONException e) {
+                Log.e(LOG_TAG, e.getMessage(), e);
+                e.printStackTrace();
+            }
+
+            //This will only happen if there was an error getting or parsing Sdata
             return data;
         }
 
+        private ArrayList<String[]> parseSpotifyJson(String artistJson)
+                throws JSONException {
+
+            //the ArrayList<String> that will ultimately be returned and its constituent artist containers
+            ArrayList<String[]> artistArrayList= new ArrayList<>();
+            String[] artistData= new String[3];
+
+            //These are the names of the JSON objects that need to be extracted
+            final String SPO_ITEMS= "items";
+            final String SPO_NAME= "name";
+            final String SPO_ID= "id";
+            final String SPO_IMAGES= "images"; //ideally the 64 X 64 thumbnail images
+
+            JSONObject spotifyJson= new JSONObject(artistJson);
+            JSONArray artistArray= spotifyJson.getJSONArray(SPO_ITEMS);
+
+            for(int i= 0; i < artistArray.length(); i++) {
+
+                //Get data from artist object i in the list
+                JSONObject suggestedArtist= artistArray.getJSONObject(i);
+
+                //Get the string representing the artist name and add it to data
+                artistData[0]= suggestedArtist.getString(SPO_NAME);
+
+
+                //Get the string representing the Spotify ID
+                artistData[1]= suggestedArtist.getString(SPO_ID);
+
+
+
+                //Get image thumbnail is trickier because you need right size and none may even exist
+                JSONArray artistImageArray= suggestedArtist.getJSONArray(SPO_IMAGES);
+                //search through array to find smallest pictur--if any pictures exist
+                if (artistImageArray.length() != 0) {
+
+                    //store size of first image and its index for comparison
+
+                    int smallestSize= Integer.parseInt(artistImageArray.getJSONObject(0).getString("height")) *
+                            Integer.parseInt(artistImageArray.getJSONObject(0).getString("width"));
+                    int smallestImageIndex= 0;
+
+                    //compare other images to find smaller
+                    int index= 0;
+                    while (index < artistImageArray.length()) {
+                        //calculate image size
+                        int contenderImage= Integer.parseInt(artistImageArray.getJSONObject(index).getString("height"))
+                                * Integer.parseInt(artistImageArray.getJSONObject(index).getString("width"));
+
+                        //if smaller than switch with current image
+                        if (contenderImage < smallestSize) {
+
+                            smallestSize= contenderImage;
+                            smallestImageIndex= index;
+
+                        }
+
+
+                        index += index;
+                    }
+                    //add image to data
+                    artistData[2]= artistImageArray.getJSONObject(smallestImageIndex).getString("url");
+                }
+
+                artistArrayList.add(artistData);
+
+            }
+
+
+            return artistArrayList;
+        }
+
+
         @Override
-        protected void onPostExecute(ArrayList<String> result) {
+        protected void onPostExecute(ArrayList<String[]> result) {
             if (result != null) {
                 spotifyAdapter.clear();
                 spotifyAdapter.addAll(result);

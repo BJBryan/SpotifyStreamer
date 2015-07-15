@@ -35,12 +35,11 @@ public class CustomListViewAdapter extends ArrayAdapter<RowItem> {
         this.viewIds= viewIds;
     }
 
-    //TODO change the type later when spotify json reader is hooked up
-    public void addAll(ArrayList<String> result) {
-       //  rowItems= new ArrayList<RowItem>();
+    //TODO fill in
+    public void addAll(ArrayList<String[]> artistData) {
 
-        for (int i=0; i < result.size(); i++) {
-            RowItem item= new RowItem(result.get(i));
+        for (int i=0; i < artistData.size(); i++) {
+            RowItem item= new RowItem(artistData.get(i)[0]);
             this.add(item);
         }
 
